@@ -104,7 +104,7 @@ export const getCurrentUserEmail = createCurrentUserSelector( 'email' );
  * @return {?Boolean}            Whether capability name is valid
  */
 export function isValidCapability( state, siteId, capability ) {
-	const capabilities = state.currentUser.capabilities[ siteId ];
+	const capabilities = get( state, [ 'currentUser', 'capabilities', siteId ] );
 	if ( ! capabilities ) {
 		return null;
 	}
