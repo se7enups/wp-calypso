@@ -133,7 +133,8 @@
 		"woocommerce/extension-settings-shipping": true,
 		"woocommerce/extension-settings-tax": true,
 		"woocommerce/extension-stats": true,
-		"wpcom-user-bootstrap": true
+	    "woocommerce-services/extension-enabled": true,
+	    "wpcom-user-bootstrap": true
 	},
 	"siftscience_key": "e00e878351",
 	"wpcom_signup_id": "39911",

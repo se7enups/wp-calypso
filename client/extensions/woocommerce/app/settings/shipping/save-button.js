@@ -6,6 +6,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { localize } from 'i18n-calypso';
 import page from 'page';
+import config from 'config';
 
 /**
  * Internal dependencies
@@ -19,7 +20,7 @@ import {
 import { getLink } from 'woocommerce/lib/nav-utils';
 import { getSelectedSiteWithFallback } from 'woocommerce/state/sites/selectors';
 
-class ShippingSettingsFinishedButton extends Component {
+class ShippingSettingsSaveButton extends Component {
 
 	componentDidMount = () => {
 		const { site } = this.props;
@@ -40,23 +41,31 @@ class ShippingSettingsFinishedButton extends Component {
 		}
 	}
 
+	save = () => {
+		return null;
+	}
+
 	redirect = () => {
 		const { site } = this.props;
+		this.save();
 		page.redirect( getLink( '/store/:site', site ) );
 	}
 
 	render() {
 		const { translate, loading, site, finishedInitialSetup } = this.props;
+		const wcsEnabled = config.isEnabled( 'woocommerce-services/extension-enabled' );
 
 		if ( loading || ! site ) {
 			return null;
 		}
 
 		if ( finishedInitialSetup ) {
-			return null;
+			return wcsEnabled
+				? <Button onClick={ this.save } primary>{ translate( 'Save' ) }</Button>
+				: null;
 		}
-
-		return <Button onClick={ this.redirect } primary>{ translate( 'I\'m Finished' ) }</Button>;
+		const label = wcsEnabled ? translate( 'Save and finish' ) : translate( 'I\'m Finished' );
+		return <Button onClick={ this.redirect } primary>{ label }</Button>;
 	}
 }
 
@@ -80,4 +89,4 @@ function mapDispatchToProps( dispatch ) {
 	);
 }
 
-export default connect( mapStateToProps, mapDispatchToProps )( localize( ShippingSettingsFinishedButton ) );
+export default connect( mapStateToProps, mapDispatchToProps )( localize( ShippingSettingsSaveButton ) );
