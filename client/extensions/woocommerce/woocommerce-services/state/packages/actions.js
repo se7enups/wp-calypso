@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import * as api from 'api';
+import * as api from '../../api';
 
 export const ADD_PACKAGE = 'ADD_PACKAGE';
 export const REMOVE_PACKAGE = 'REMOVE_PACKAGE';
@@ -18,73 +18,89 @@ export const TOGGLE_PACKAGE = 'TOGGLE_PACKAGE';
 export const SET_IS_FETCHING = 'SET_IS_FETCHING';
 export const INIT_PACKAGES_FORM = 'INIT_PACKAGES_FORM';
 
-export const addPackage = () => ( {
+import { getPackagesForm } from './selectors';
+
+export const addPackage = ( siteId ) => ( {
 	type: ADD_PACKAGE,
+	siteId,
 } );
 
-export const removePackage = ( index ) => ( {
+export const removePackage = ( siteId, index ) => ( {
 	type: REMOVE_PACKAGE,
 	index,
+	siteId,
 } );
 
-export const editPackage = ( packageToEdit ) => ( {
+export const editPackage = ( siteId, packageToEdit ) => ( {
 	type: EDIT_PACKAGE,
 	'package': packageToEdit,
+	siteId,
 } );
 
-export const dismissModal = () => ( {
+export const dismissModal = ( siteId ) => ( {
 	type: DISMISS_MODAL,
+	siteId,
 } );
 
-export const setSelectedPreset = ( value ) => ( {
+export const setSelectedPreset = ( siteId, value ) => ( {
 	type: SET_SELECTED_PRESET,
 	value,
+	siteId,
 } );
 
-export const savePackage = ( packageData ) => ( {
+export const savePackage = ( siteId, packageData ) => ( {
 	type: SAVE_PACKAGE,
 	packageData,
+	siteId,
 } );
 
-export const updatePackagesField = ( newValues ) => ( {
+export const updatePackagesField = ( siteId, newValues ) => ( {
 	type: UPDATE_PACKAGES_FIELD,
 	values: newValues,
+	siteId,
 } );
 
-export const toggleOuterDimensions = () => ( {
+export const toggleOuterDimensions = ( siteId ) => ( {
 	type: TOGGLE_OUTER_DIMENSIONS,
+	siteId,
 } );
 
-export const toggleAll = ( serviceId, groupId, checked ) => ( {
+export const toggleAll = ( siteId, serviceId, groupId, checked ) => ( {
 	type: TOGGLE_ALL,
 	serviceId,
 	groupId,
 	checked,
+	siteId,
 } );
 
-export const togglePackage = ( serviceId, packageId ) => ( {
+export const togglePackage = ( siteId, serviceId, packageId ) => ( {
 	type: TOGGLE_PACKAGE,
 	serviceId,
 	packageId,
+	siteId,
 } );
 
-export const setModalErrors = ( value ) => ( {
+export const setModalErrors = ( siteId, value ) => ( {
 	type: SET_MODAL_ERRORS,
 	value,
+	siteId,
 } );
 
-export const setIsSaving = ( isSaving ) => ( {
+export const setIsSaving = ( siteId, isSaving ) => ( {
 	type: SET_IS_SAVING,
 	isSaving,
+	siteId,
 } );
 
-export const fetchSettings = () => ( dispatch, getState ) => {
-	if ( getState().form.packages || getState().form.isFetching ) {
+export const fetchSettings = ( siteId ) => ( dispatch, getState ) => {
+	const form = getPackagesForm( getState(), siteId );
+
+	if ( form && ( form.packages || form.isFetching ) ) {
 		return;
 	}
-	dispatch( { type: SET_IS_FETCHING, isFetching: true } );
+	dispatch( { type: SET_IS_FETCHING, isFetching: true, siteId } );
 
-	api.get( api.url.packages() )
+	api.get( siteId, api.url.packages() )
 		.then( ( { formData, formSchema, storeOptions } ) => {
 			dispatch( {
 				type: INIT_PACKAGES_FORM,
@@ -93,18 +109,20 @@ export const fetchSettings = () => ( dispatch, getState ) => {
 				weightUnit: storeOptions.weight_unit,
 				packageSchema: formSchema.custom.items,
 				predefinedSchema: formSchema.predefined,
+				siteId,
 			} );
 		} )
 		.catch( ( error ) => {
 			console.error( error ); // eslint-disable-line no-console
 		} )
-		.then( () => dispatch( { type: SET_IS_FETCHING, isFetching: false } ) );
+		.then( () => dispatch( { type: SET_IS_FETCHING, isFetching: false, siteId } ) );
 };
 
-export const submit = ( onSaveSuccess, onSaveFailure ) => ( dispatch, getState ) => {
-	dispatch( setIsSaving( true ) );
-	api.post( api.url.packages(), getState().form.packages )
+export const submit = ( siteId, onSaveSuccess, onSaveFailure ) => ( dispatch, getState ) => {
+	const form = getPackagesForm( getState(), siteId );
+	dispatch( setIsSaving( siteId, true ) );
+	api.post( siteId, api.url.packages(), form.packages )
 		.then( onSaveSuccess )
 		.catch( onSaveFailure )
-		.then( () => dispatch( setIsSaving( false ) ) );
+		.then( () => dispatch( setIsSaving( siteId, false ) ) );
 };

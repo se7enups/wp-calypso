@@ -4,6 +4,7 @@
 import React, { PropTypes } from 'react';
 import { translate as __ } from 'i18n-calypso';
 import Gridicon from 'gridicons';
+import { includes } from 'lodash';
 
 /**
  * Internal dependencies
@@ -24,11 +25,11 @@ const noPackages = () => {
 	);
 };
 
-const PackagesList = ( { packages, dimensionUnit, editable, selected, serviceId, removePackage, editPackage, togglePackage } ) => {
+const PackagesList = ( { siteId, packages, dimensionUnit, editable, selected, serviceId, removePackage, editPackage, togglePackage } ) => {
 	const renderPackageListItem = ( pckg, idx ) => {
-		const isSelected = selected && selected.includes( pckg.id );
-		const onToggle = () => togglePackage( serviceId, pckg.id );
-		const onRemove = () => removePackage( idx );
+		const isSelected = selected && includes( selected, pckg.id );
+		const onToggle = () => togglePackage( siteId, serviceId, pckg.id );
+		const onRemove = () => removePackage( siteId, idx );
 
 		return (
 			<PackagesListItem
@@ -37,6 +38,7 @@ const PackagesList = ( { packages, dimensionUnit, editable, selected, serviceId,
 				data={ pckg }
 				selected={ isSelected }
 				{ ...{
+					siteId,
 					onToggle,
 					onRemove,
 					editable,
@@ -75,8 +77,9 @@ const PackagesList = ( { packages, dimensionUnit, editable, selected, serviceId,
 };
 
 PackagesList.propTypes = {
-	packages: PropTypes.array.isRequired,
-	dimensionUnit: PropTypes.string.isRequired,
+	siteId: PropTypes.number,
+	packages: PropTypes.array,
+	dimensionUnit: PropTypes.string,
 	editable: PropTypes.bool.isRequired,
 	selected: PropTypes.array,
 	serviceId: PropTypes.string,

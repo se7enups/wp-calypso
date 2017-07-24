@@ -13,12 +13,12 @@ import FormFieldset from 'components/forms/form-fieldset';
 import FormLabel from 'components/forms/form-label';
 import FormTextInput from 'components/forms/form-text-input';
 import FormButton from 'components/forms/form-button';
-import Modal from 'components/modal';
+import Dialog from 'components/dialog';
 import AddPackagePresets from './add-package-presets';
 import checkInputs from './modal-errors';
 import inputFilters from './input-filters';
-import FieldError from 'components/field-error';
-import FieldDescription from 'components/field-description';
+//import FieldError from 'components/field-error';
+//import FieldDescription from 'components/field-description';
 
 const getDialogButtons = ( mode, dismissModal, savePackage ) => {
 	return [
@@ -31,10 +31,10 @@ const getDialogButtons = ( mode, dismissModal, savePackage ) => {
 	];
 };
 
-const OuterDimensionsToggle = ( { toggleOuterDimensions } ) => {
+const OuterDimensionsToggle = ( { siteId, toggleOuterDimensions } ) => {
 	const onClick = ( evt ) => {
 		evt.preventDefault();
-		toggleOuterDimensions();
+		toggleOuterDimensions( siteId );
 	};
 
 	return (
@@ -46,6 +46,7 @@ const OuterDimensionsToggle = ( { toggleOuterDimensions } ) => {
 
 const AddPackageDialog = ( props ) => {
 	const {
+		siteId,
 		form,
 		dismissModal,
 		toggleOuterDimensions,
@@ -102,33 +103,35 @@ const AddPackageDialog = ( props ) => {
 
 		const errors = checkInputs( filteredPackageData, boxNames, packageSchema );
 		if ( errors.any ) {
-			updatePackagesField( filteredPackageData );
-			setModalErrors( errors );
+			updatePackagesField( siteId, filteredPackageData );
+			setModalErrors( siteId, errors );
 			return;
 		}
 
-		savePackage( filteredPackageData );
+		savePackage( siteId, filteredPackageData );
 	};
 
 	const updateTextField = ( event ) => {
 		const key = event.target.name;
 		const value = event.target.value;
-		setModalErrors( _.omit( modalErrors, key ) );
-		updatePackagesField( { [ key ]: value } );
+		setModalErrors( siteId, _.omit( modalErrors, key ) );
+		updatePackagesField( siteId, { [ key ]: value } );
 	};
 
 	const fieldInfo = ( field, nonEmptyText ) => {
 		const altText = nonEmptyText || __( 'Invalid value' );
 		const text = '' === _.trim( packageData[ field ] ) ? __( 'This field is required' ) : altText;
-		return modalErrors[ field ] ? <FieldError text={ text } /> : null;
+		return null;//return modalErrors[ field ] ? <FieldError text={ text } /> : null;
 	};
 
+	const onClose = () => ( dismissModal( siteId ) );
+
 	return (
-		<Modal
+		<Dialog
 			isVisible={ showModal }
 			additionalClassNames="wcc-shipping-add-edit-package-dialog"
-			onClose={ dismissModal }
-			buttons={ getDialogButtons( mode, dismissModal, onSave ) }>
+			onClose={ onClose }
+			buttons={ getDialogButtons( mode, onClose, onSave ) }>
 			<FormSectionHeading>
 				{ ( 'edit' === mode ) ? __( 'Edit package' ) : __( 'Add a package' ) }
 			</FormSectionHeading>
@@ -157,7 +160,7 @@ const AddPackageDialog = ( props ) => {
 					isError={ modalErrors.inner_dimensions }
 				/>
 				{ fieldInfo( 'inner_dimensions' ) }
-				{ ! isOuterDimensionsVisible ? <OuterDimensionsToggle { ...{ toggleOuterDimensions } } /> : null }
+				{ ! isOuterDimensionsVisible ? <OuterDimensionsToggle { ...{ siteId, toggleOuterDimensions } } /> : null }
 			</FormFieldset>
 			{ isOuterDimensionsVisible
 				? ( <FormFieldset>
@@ -205,13 +208,14 @@ const AddPackageDialog = ( props ) => {
 					<span className="wcc-shipping-add-package-weight-unit">{ weightUnit }</span>
 					{ fieldInfo( 'max_weight' ) }
 				</div>
-				<FieldDescription text={ __( 'Defines both the weight of the empty box and the max weight it can hold' ) } />
+				{ null /*<FieldDescription text={ __( 'Defines both the weight of the empty box and the max weight it can hold' ) } />*/ }
 			</FormFieldset>
-		</Modal>
+		</Dialog>
 	);
 };
 
 AddPackageDialog.propTypes = {
+	siteId: PropTypes.number,
 	dismissModal: PropTypes.func.isRequired,
 	form: PropTypes.object.isRequired,
 	updatePackagesField: PropTypes.func.isRequired,

@@ -57,11 +57,11 @@ const handleSelectEvent = ( e, selectDefault, selectPreset, setSelectedPreset ) 
 	}
 };
 
-const AddPackagePresets = ( { selectedPreset, setSelectedPreset, presets, setModalErrors, updatePackagesField } ) => {
+const AddPackagePresets = ( { siteId, selectedPreset, setSelectedPreset, presets, setModalErrors, updatePackagesField } ) => {
 	const onSelectPreset = ( idx ) => {
 		const preset = presets.boxes[ idx ];
-		setModalErrors( {} );
-		updatePackagesField( {
+		setModalErrors( siteId, {} );
+		updatePackagesField( siteId, {
 			index: null,
 			is_user_defined: false,
 			...preset,
@@ -69,8 +69,8 @@ const AddPackagePresets = ( { selectedPreset, setSelectedPreset, presets, setMod
 	};
 
 	const onSelectDefault = ( value ) => {
-		setModalErrors( {} );
-		updatePackagesField( {
+		setModalErrors( siteId, {} );
+		updatePackagesField( siteId, {
 			index: null,
 			is_letter: 'envelope' === value,
 			name: null,
@@ -82,7 +82,7 @@ const AddPackagePresets = ( { selectedPreset, setSelectedPreset, presets, setMod
 		} );
 	};
 
-	const onChange = ( event ) => handleSelectEvent( event, onSelectDefault, onSelectPreset, setSelectedPreset );
+	const onChange = ( event ) => handleSelectEvent( event, onSelectDefault, onSelectPreset, setSelectedPreset.bind( null, siteId ) );
 
 	return (
 		<FormFieldset>
@@ -98,6 +98,7 @@ const AddPackagePresets = ( { selectedPreset, setSelectedPreset, presets, setMod
 };
 
 AddPackagePresets.propTypes = {
+	siteId: PropTypes.number,
 	selectedPreset: PropTypes.string,
 	setSelectedPreset: PropTypes.func.isRequired,
 	presets: PropTypes.object,

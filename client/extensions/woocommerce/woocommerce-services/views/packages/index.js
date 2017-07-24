@@ -1,42 +1,42 @@
 /**
  * External dependencies
  */
-import React, { PropTypes } from 'react';
+import React, { PropTypes, Component } from 'react';
 import { translate as __ } from 'i18n-calypso';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import _ from 'lodash';
-import Gridicon from 'gridicons';
 
 /**
  * Internal dependencies
  */
+import BulkSelect from '../../../components/bulk-select';
 import CompactCard from 'components/card/compact';
 import FormSectionHeading from 'components/forms/form-section-heading';
-import Checkbox from 'components/checkbox';
-import ActionButtons from 'components/action-buttons';
 import FormFieldset from 'components/forms/form-fieldset';
 import FormButton from 'components/forms/form-button';
 import FoldableCard from 'components/foldable-card';
 import Spinner from 'components/spinner';
 import PackagesList from './packages-list';
 import AddPackageDialog from './add-package';
-import * as PackagesActions from '../state/actions';
-import * as NoticeActions from 'state/notices/actions';
-import GlobalNotices from 'components/global-notices';
-import notices from 'notices';
+import * as PackagesActions from '../../state/packages/actions';
+import { getSelectedSiteId } from 'state/ui/selectors';
+import { getPackagesForm } from '../../state/packages/selectors';
 
-const Packages = ( props ) => {
-	const isFetching = props.form.isFetching;
+class Packages extends Component {
+	componentWillMount() {
+		if ( this.props.siteId ) {
+			this.props.fetchSettings( this.props.siteId );
+		}
+	}
 
-	const foldableActionButton = (
-		<button className="foldable-card__action foldable-card__expand" type="button">
-			<span className="screen-reader-text">{ __( 'Expand Services' ) }</span>
-			<Gridicon icon="chevron-down" size={ 24 } />
-		</button>
-	);
+	componentWillReceiveProps( props ) {
+		if ( props.siteId !== this.props.siteId ) {
+			this.props.fetchSettings( props.siteId );
+		}
+	}
 
-	const predefSummary = ( serviceSelected, groupDefinitions ) => {
+	predefSummary = ( serviceSelected, groupDefinitions ) => {
 		const groupPackageIds = groupDefinitions.map( ( def ) => def.id );
 		const diffLen = _.difference( groupPackageIds, serviceSelected ).length;
 
@@ -51,42 +51,40 @@ const Packages = ( props ) => {
 		} );
 	};
 
-	const renderPredefHeader = ( title, selected, packages, serviceId, groupId ) => {
+	renderPredefHeader = ( title, selected, packages, serviceId, groupId ) => {
 		if ( ! selected ) {
 			return null;
 		}
 
-		const onToggle = ( event ) => {
-			props.toggleAll( serviceId, groupId, event.target.checked );
+		const onToggle = ( state, event ) => {
+			event.stopPropagation();
+			this.props.toggleAll( this.props.siteId, serviceId, groupId, event.target.checked );
 		};
 
-		const stopPropagation = ( event ) => event.stopPropagation();
-
 		return (
-			<div className="wcc-predefined-packages-group-header" >
-				<Checkbox
-					checked={ selected.length === packages.length }
-					partialChecked={ Boolean( selected.length ) }
-					onChange={ onToggle }
-					onClick={ stopPropagation } />
+			<div className="packages__group-header" >
+				<BulkSelect
+					totalElements={ packages.length }
+					selectedElements={ selected.length }
+					onToggle={ onToggle } />
 				{ title }
 			</div>
 		);
 	};
 
-	const renderPredefinedPackages = () => {
+	renderPredefinedPackages = () => {
 		const elements = [];
 
-		if ( isFetching ) {
+		if ( this.props.isFetching ) {
 			return (
-				<div className="loading-spinner">
+				<div>
 					<Spinner size={ 24 } />
 				</div>
 			);
 		}
 
-		_.forEach( props.form.predefinedSchema, ( servicePackages, serviceId ) => {
-			const serviceSelected = props.form.packages.predefined[ serviceId ] || [];
+		_.forEach( this.props.form.predefinedSchema, ( servicePackages, serviceId ) => {
+			const serviceSelected = this.props.form.packages.predefined[ serviceId ] || [];
 
 			_.forEach( servicePackages, ( predefGroup, groupId ) => {
 				const groupPackages = predefGroup.definitions;
@@ -96,27 +94,28 @@ const Packages = ( props ) => {
 				}
 
 				const groupSelected = _.filter( serviceSelected, selectedId => _.some( groupPackages, pckg => pckg.id === selectedId ) );
-				const summary = predefSummary( groupSelected, nonFlatRates );
+				const summary = this.predefSummary( groupSelected, nonFlatRates );
 
 				elements.push( <FoldableCard
 					key={ `${ serviceId }_${ groupId }` }
-					header={ renderPredefHeader( predefGroup.title, groupSelected, nonFlatRates, serviceId, groupId ) }
+					header={ this.renderPredefHeader( predefGroup.title, groupSelected, nonFlatRates, serviceId, groupId ) }
 					summary={ summary }
 					expandedSummary={ summary }
 					clickableHeader={ true }
 					compact
-					actionButton={ foldableActionButton }
-					actionButtonExpanded={ foldableActionButton }
 					expanded={ false }
+					screenReaderText={ __( 'Expand Services' ) }
+					icon="chevron-down"
 				>
 					<PackagesList
+						siteId={ this.props.siteId }
 						packages={ groupPackages }
 						selected={ groupSelected }
 						serviceId={ serviceId }
 						groupId={ groupId }
-						toggleAll={ props.toggleAll }
-						togglePackage={ props.togglePackage }
-						dimensionUnit={ props.form.dimensionUnit }
+						toggleAll={ this.props.toggleAll }
+						togglePackage={ this.props.togglePackage }
+						dimensionUnit={ this.props.form.dimensionUnit }
 						editable={ false } />
 				</FoldableCard> );
 			} );
@@ -125,21 +124,10 @@ const Packages = ( props ) => {
 		return elements;
 	};
 
-	const onSaveSuccess = () => props.noticeActions.successNotice( __( 'Your packages have been saved.' ), { duration: 5000 } );
-	const onSaveFailure = () => props.noticeActions.errorNotice( __( 'Unable to save your packages. Please try again.' ) );
-	const onSaveChanges = () => props.submit( onSaveSuccess, onSaveFailure );
+	render() {
+		const { isFetching, siteId, form } = this.props;
 
-	const buttons = [
-		{
-			label: __( 'Save changes' ),
-			onClick: onSaveChanges,
-			isPrimary: true,
-			isDisabled: props.form.isSaving || props.form.pristine,
-		},
-	];
-
-	const renderContent = () => {
-		if ( ! props.form.packages && ! isFetching ) {
+		if ( ! form.packages && ! isFetching ) {
 			return (
 				<CompactCard className="settings-group-card">
 					<p className="error-message">
@@ -149,25 +137,28 @@ const Packages = ( props ) => {
 			);
 		}
 
+		const addPackage = () => ( this.props.addPackage( siteId ) );
+
 		return (
 			<div>
 				<CompactCard className="settings-group-card">
 					<FormSectionHeading className="settings-group-header">{ __( 'Custom packages' ) }</FormSectionHeading>
 					<div className="settings-group-content">
 						<PackagesList
-							packages={ ( props.form.packages || {} ).custom }
-							dimensionUnit={ props.form.dimensionUnit }
+							siteId={ this.props.siteId }
+							packages={ ( form.packages || {} ).custom }
+							dimensionUnit={ form.dimensionUnit }
 							editable={ true }
-							removePackage={ props.removePackage }
-							editPackage={ props.editPackage } />
-						{ ( ! isFetching ) && <AddPackageDialog { ...props } /> }
+							removePackage={ this.props.removePackage }
+							editPackage={ this.props.editPackage } />
+						{ ( ! isFetching ) && <AddPackageDialog { ...this.props } /> }
 						<FormFieldset className="add-package-button-field">
 							<FormButton
 								type="button"
 								isPrimary={ false }
 								compact
 								disabled={ isFetching }
-								onClick={ props.addPackage } >
+								onClick={ addPackage } >
 								{ __( 'Add a package' ) }
 							</FormButton>
 						</FormFieldset>
@@ -176,23 +167,13 @@ const Packages = ( props ) => {
 				<CompactCard className="settings-group-card">
 					<FormSectionHeading className="settings-group-header">{ __( 'Predefined packages' ) }</FormSectionHeading>
 					<div className="settings-group-content">
-						{ renderPredefinedPackages() }
+						{ this.renderPredefinedPackages() }
 					</div>
 				</CompactCard>
 			</div>
 		);
 	};
-
-	return (
-		<div>
-			<GlobalNotices id="notices" notices={ notices.list } />
-			{ renderContent() }
-			<CompactCard className="save-button-bar">
-				<ActionButtons buttons={ buttons } />
-			</CompactCard>
-		</div>
-	);
-};
+}
 
 Packages.propTypes = {
 	addPackage: PropTypes.func.isRequired,
@@ -206,14 +187,20 @@ Packages.propTypes = {
 	setModalErrors: PropTypes.func.isRequired,
 	showModal: PropTypes.bool,
 	form: PropTypes.object,
-	noticeActions: PropTypes.object,
 };
 
 export default connect(
-	( state ) => state,
+	( state ) => {
+		const siteId = getSelectedSiteId( state );
+		const form = getPackagesForm( state, siteId );
+		return {
+			siteId,
+			isFetching: ! form || form.isFetching,
+			form,
+		};
+	},
 	( dispatch ) => (
 		{
 			...bindActionCreators( PackagesActions, dispatch ),
-			noticeActions: bindActionCreators( NoticeActions, dispatch ),
 		} )
 )( Packages );

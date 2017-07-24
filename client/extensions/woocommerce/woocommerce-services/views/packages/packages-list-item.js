@@ -11,7 +11,7 @@ import classNames from 'classnames';
  * Internal dependencies
  */
 import Button from 'components/button';
-import Checkbox from 'components/checkbox';
+import FormCheckbox from 'components/forms/form-checkbox';
 
 const renderIcon = ( isLetter, isError, onClick ) => {
 	let icon;
@@ -46,7 +46,7 @@ const renderName = ( name, openModal ) => {
 const renderSelect = ( selected, onToggle ) => {
 	return (
 		<div className="package-actions">
-			<Checkbox checked={ selected } onChange={ onToggle } />
+			<FormCheckbox checked={ selected } onChange={ onToggle } />
 		</div>
 	);
 };
@@ -62,6 +62,7 @@ const renderActions = ( onRemove ) => {
 };
 
 const PackagesListItem = ( {
+	siteId,
 	index,
 	data,
 	dimensionUnit,
@@ -74,7 +75,7 @@ const PackagesListItem = ( {
 } ) => {
 	const openModal = editable ? ( event ) => {
 		event.preventDefault();
-		editPackage( Object.assign( {}, data, { index } ) );
+		editPackage( siteId, Object.assign( {}, data, { index } ) );
 	} : null;
 
 	return (
@@ -95,6 +96,7 @@ const PackagesListItem = ( {
 };
 
 PackagesListItem.propTypes = {
+	siteId: PropTypes.number,
 	index: PropTypes.number.isRequired,
 	data: PropTypes.shape( {
 		name: PropTypes.string,

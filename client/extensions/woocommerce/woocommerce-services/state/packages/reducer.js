@@ -202,6 +202,9 @@ reducers[ INIT_PACKAGES_FORM ] = ( state, { packages, dimensionUnit, weightUnit,
 		weightUnit,
 		packageSchema,
 		predefinedSchema,
+		packageData: state.packageData || {
+			is_user_defined: true,
+		},
 	};
 };
 
