@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React, { PropTypes, Component } from 'react';
-import { translate as __ } from 'i18n-calypso';
+import { localize } from 'i18n-calypso';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import _ from 'lodash';
@@ -10,11 +10,10 @@ import _ from 'lodash';
 /**
  * Internal dependencies
  */
-import BulkSelect from '../../../components/bulk-select';
-import CompactCard from 'components/card/compact';
-import FormSectionHeading from 'components/forms/form-section-heading';
-import FormFieldset from 'components/forms/form-fieldset';
-import FormButton from 'components/forms/form-button';
+import BulkSelect from 'woocommerce/components/bulk-select';
+import Button from 'components/button';
+import Card from 'components/card';
+import ExtendedHeader from 'woocommerce/components/extended-header';
 import FoldableCard from 'components/foldable-card';
 import Spinner from 'components/spinner';
 import PackagesList from './packages-list';
@@ -39,13 +38,14 @@ class Packages extends Component {
 	predefSummary = ( serviceSelected, groupDefinitions ) => {
 		const groupPackageIds = groupDefinitions.map( ( def ) => def.id );
 		const diffLen = _.difference( groupPackageIds, serviceSelected ).length;
+		const { translate } = this.props;
 
 		if ( 0 >= diffLen ) {
-			return __( 'All packages selected' );
+			return translate( 'All packages selected' );
 		}
 
 		const selectedCount = groupPackageIds.length - diffLen;
-		return __( '%(selectedCount)d package selected', '%(selectedCount)d packages selected', {
+		return translate( '%(selectedCount)d package selected', '%(selectedCount)d packages selected', {
 			count: selectedCount,
 			args: { selectedCount },
 		} );
@@ -66,7 +66,8 @@ class Packages extends Component {
 				<BulkSelect
 					totalElements={ packages.length }
 					selectedElements={ selected.length }
-					onToggle={ onToggle } />
+					onToggle={ onToggle }
+					className="packages__group-header-checkbox" />
 				{ title }
 			</div>
 		);
@@ -74,8 +75,9 @@ class Packages extends Component {
 
 	renderPredefinedPackages = () => {
 		const elements = [];
+		const { siteId, isFetching, translate, form } = this.props;
 
-		if ( this.props.isFetching ) {
+		if ( isFetching ) {
 			return (
 				<div>
 					<Spinner size={ 24 } />
@@ -83,8 +85,8 @@ class Packages extends Component {
 			);
 		}
 
-		_.forEach( this.props.form.predefinedSchema, ( servicePackages, serviceId ) => {
-			const serviceSelected = this.props.form.packages.predefined[ serviceId ] || [];
+		_.forEach( form.predefinedSchema, ( servicePackages, serviceId ) => {
+			const serviceSelected = form.packages.predefined[ serviceId ] || [];
 
 			_.forEach( servicePackages, ( predefGroup, groupId ) => {
 				const groupPackages = predefGroup.definitions;
@@ -97,25 +99,25 @@ class Packages extends Component {
 				const summary = this.predefSummary( groupSelected, nonFlatRates );
 
 				elements.push( <FoldableCard
+					className="packages__predefined-packages"
 					key={ `${ serviceId }_${ groupId }` }
 					header={ this.renderPredefHeader( predefGroup.title, groupSelected, nonFlatRates, serviceId, groupId ) }
 					summary={ summary }
 					expandedSummary={ summary }
 					clickableHeader={ true }
-					compact
 					expanded={ false }
-					screenReaderText={ __( 'Expand Services' ) }
+					screenReaderText={ translate( 'Expand Services' ) }
 					icon="chevron-down"
 				>
 					<PackagesList
-						siteId={ this.props.siteId }
+						siteId={ siteId }
 						packages={ groupPackages }
 						selected={ groupSelected }
 						serviceId={ serviceId }
 						groupId={ groupId }
 						toggleAll={ this.props.toggleAll }
 						togglePackage={ this.props.togglePackage }
-						dimensionUnit={ this.props.form.dimensionUnit }
+						dimensionUnit={ form.dimensionUnit }
 						editable={ false } />
 				</FoldableCard> );
 			} );
@@ -125,54 +127,36 @@ class Packages extends Component {
 	};
 
 	render() {
-		const { isFetching, siteId, form } = this.props;
-
-		if ( ! form.packages && ! isFetching ) {
-			return (
-				<CompactCard className="settings-group-card">
-					<p className="error-message">
-						{ __( 'Unable to get your settings. Please refresh the page to try again.' ) }
-					</p>
-				</CompactCard>
-			);
-		}
+		const { isFetching, siteId, form, translate } = this.props;
 
 		const addPackage = () => ( this.props.addPackage( siteId ) );
 
 		return (
 			<div>
-				<CompactCard className="settings-group-card">
-					<FormSectionHeading className="settings-group-header">{ __( 'Custom packages' ) }</FormSectionHeading>
-					<div className="settings-group-content">
-						<PackagesList
-							siteId={ this.props.siteId }
-							packages={ ( form.packages || {} ).custom }
-							dimensionUnit={ form.dimensionUnit }
-							editable={ true }
-							removePackage={ this.props.removePackage }
-							editPackage={ this.props.editPackage } />
-						{ ( ! isFetching ) && <AddPackageDialog { ...this.props } /> }
-						<FormFieldset className="add-package-button-field">
-							<FormButton
-								type="button"
-								isPrimary={ false }
-								compact
-								disabled={ isFetching }
-								onClick={ addPackage } >
-								{ __( 'Add a package' ) }
-							</FormButton>
-						</FormFieldset>
-					</div>
-				</CompactCard>
-				<CompactCard className="settings-group-card">
-					<FormSectionHeading className="settings-group-header">{ __( 'Predefined packages' ) }</FormSectionHeading>
-					<div className="settings-group-content">
-						{ this.renderPredefinedPackages() }
-					</div>
-				</CompactCard>
+				<ExtendedHeader
+					label={ translate( 'Packages' ) }
+					description={ translate( 'Add boxes, envelopes, and other packages you use most frequently.' ) }>
+					<Button onClick={ addPackage } disabled={ isFetching }>{ translate( 'Add package' ) }</Button>
+				</ExtendedHeader>
+				<Card className="packages__packages">
+					<PackagesList
+						siteId={ this.props.siteId }
+						packages={ ( form.packages || {} ).custom }
+						dimensionUnit={ form.dimensionUnit }
+						editable={ true }
+						removePackage={ this.props.removePackage }
+						editPackage={ this.props.editPackage } />
+					{ ( ! isFetching ) && <AddPackageDialog { ...this.props } /> }
+				</Card>
+				<ExtendedHeader
+					label={ translate( 'Service Packages' ) }
+					description={ translate( 'Select packages provided by the shipping services that you use.' ) } />
+				<Card className="packages__packages">
+					{ this.renderPredefinedPackages() }
+				</Card>
 			</div>
 		);
-	};
+	}
 }
 
 Packages.propTypes = {
@@ -195,7 +179,7 @@ export default connect(
 		const form = getPackagesForm( state, siteId );
 		return {
 			siteId,
-			isFetching: ! form || form.isFetching,
+			isFetching: ! form || ! form.packages || form.isFetching,
 			form,
 		};
 	},
@@ -203,4 +187,4 @@ export default connect(
 		{
 			...bindActionCreators( PackagesActions, dispatch ),
 		} )
-)( Packages );
+)( localize( Packages ) );

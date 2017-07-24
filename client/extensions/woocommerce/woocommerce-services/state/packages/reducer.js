@@ -138,6 +138,7 @@ reducers[ REMOVE_PACKAGE ] = ( state, action ) => {
 			custom,
 		},
 		pristine: false,
+		showModal: false,
 	};
 };
 

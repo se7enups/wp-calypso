@@ -2,34 +2,30 @@
  * External dependencies
  */
 import React, { PropTypes } from 'react';
-import { translate as __ } from 'i18n-calypso';
-import Gridicon from 'gridicons';
+import { localize } from 'i18n-calypso';
 import { includes } from 'lodash';
+import classNames from 'classnames';
 
 /**
  * Internal dependencies
  */
-import FormFieldset from 'components/forms/form-fieldset';
-import FormLegend from 'components/forms/form-legend';
 import PackagesListItem from './packages-list-item';
 import Spinner from 'components/spinner';
 
-const noPackages = () => {
-	return (
-		<div className="packages-list-empty">
-			<div className="package-list-empty-icon">
-				<Gridicon icon="info" size={ 18 } />
-			</div>
-			<div className="packages-list-empty-description">{ __( 'Your packages will display here once they are added.' ) }</div>
-		</div>
-	);
-};
-
-const PackagesList = ( { siteId, packages, dimensionUnit, editable, selected, serviceId, removePackage, editPackage, togglePackage } ) => {
+const PackagesList = ( {
+		siteId,
+		packages,
+		dimensionUnit,
+		editable,
+		selected,
+		serviceId,
+		editPackage,
+		togglePackage,
+		translate
+	} ) => {
 	const renderPackageListItem = ( pckg, idx ) => {
 		const isSelected = selected && includes( selected, pckg.id );
 		const onToggle = () => togglePackage( siteId, serviceId, pckg.id );
-		const onRemove = () => removePackage( siteId, idx );
 
 		return (
 			<PackagesListItem
@@ -40,7 +36,6 @@ const PackagesList = ( { siteId, packages, dimensionUnit, editable, selected, se
 				{ ...{
 					siteId,
 					onToggle,
-					onRemove,
 					editable,
 					dimensionUnit,
 					editPackage,
@@ -57,22 +52,34 @@ const PackagesList = ( { siteId, packages, dimensionUnit, editable, selected, se
 				</div>
 			);
 		}
-		if ( ! packages.length ) {
-			return noPackages();
-		}
 		return packages.map( ( pckg, idx ) => renderPackageListItem( pckg, idx ) );
 	};
 
-	return (
-		<FormFieldset className="wcc-shipping-packages-list">
-			<div className="wcc-shipping-packages-list-header">
-				<FormLegend className="package-actions" />
-				<FormLegend className="package-type">{ __( 'Type' ) }</FormLegend>
-				<FormLegend className="package-name">{ __( 'Name' ) }</FormLegend>
-				<FormLegend className="package-dimensions">{ __( 'Dimensions (L x W x H)' ) }</FormLegend>
+	const renderHeader = () => {
+		if ( ! packages || ! packages.length ) {
+			return null;
+		}
+
+		const className = classNames( 'packages__packages-row packages__packages-header', {
+			selectable: ! editable
+		} );
+
+		return (
+			<div className={ className }>
+				{ ! editable && <div className="packages__packages-row-actions" /> }
+				<div className="packages__packages-row-icon"></div>
+				<div className="packages__packages-row-details">{ translate( 'Name' ) }</div>
+				<div className="packages__packages-row-dimensions">{ translate( 'Dimensions' ) }</div>
+				{ editable && <div className="packages__packages-row-actions" /> }
 			</div>
+		);
+	};
+
+	return (
+		<div>
+			{ renderHeader() }
 			{ renderList() }
-		</FormFieldset>
+		</div>
 	);
 };
 
@@ -86,8 +93,7 @@ PackagesList.propTypes = {
 	groupId: PropTypes.string,
 	toggleAll: PropTypes.func,
 	togglePackage: PropTypes.func,
-	removePackage: PropTypes.func,
 	editPackage: PropTypes.func,
 };
 
-export default PackagesList;
+export default localize( PackagesList );

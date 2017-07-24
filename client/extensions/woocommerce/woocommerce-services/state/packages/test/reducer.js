@@ -274,6 +274,8 @@ describe( 'Packages form reducer', () => {
 
 		const state = reducer( initialState, action );
 		expect( state.packages.custom ).to.eql( [ 1, 3 ] );
+		expect( state.pristine ).to.eql( false );
+		expect( state.showModal ).to.eql( false );
 	} );
 
 	it( 'SET_IS_SAVING', () => {
