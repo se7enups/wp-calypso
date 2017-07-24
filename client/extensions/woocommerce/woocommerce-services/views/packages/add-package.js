@@ -12,14 +12,14 @@ import Gridicon from 'gridicons';
 import FormSectionHeading from 'components/forms/form-section-heading';
 import FormFieldset from 'components/forms/form-fieldset';
 import FormLabel from 'components/forms/form-label';
+import FormSettingExplanation from 'components/forms/form-setting-explanation';
 import FormTextInput from 'components/forms/form-text-input';
 import FormButton from 'components/forms/form-button';
 import Dialog from 'components/dialog';
 import AddPackagePresets from './add-package-presets';
 import checkInputs from './modal-errors';
 import inputFilters from './input-filters';
-//import FieldError from 'components/field-error';
-//import FieldDescription from 'components/field-description';
+import FieldError from '../../components/field-error';
 
 const getDialogButtons = ( mode, dismissModal, savePackage, onRemove, translate ) => {
 	const buttons = [
@@ -135,7 +135,7 @@ const AddPackageDialog = ( props ) => {
 	const fieldInfo = ( field, nonEmptyText ) => {
 		const altText = nonEmptyText || translate( 'Invalid value' );
 		const text = '' === _.trim( packageData[ field ] ) ? translate( 'This field is required' ) : altText;
-		return null;//return modalErrors[ field ] ? <FieldError text={ text } /> : null;
+		return modalErrors[ field ] ? <FieldError text={ text } /> : null;
 	};
 
 	const onClose = () => ( dismissModal( siteId ) );
@@ -221,9 +221,9 @@ const AddPackageDialog = ( props ) => {
 					<span className="packages__add-package-weight-unit">{ weightUnit }</span>
 					{ fieldInfo( 'max_weight' ) }
 				</div>
-				{ null /*<FieldDescription
-				text={ translate( 'Defines both the weight of the empty box and the max weight it can hold' ) } />
-				*/ }
+				<FormSettingExplanation>
+					{ translate( 'Defines both the weight of the empty box and the max weight it can hold' ) }
+				</FormSettingExplanation>
 			</FormFieldset>
 		</Dialog>
 	);
