@@ -46,8 +46,7 @@ class SearchAutocomplete extends Component {
 	}
 
 	select = ( item ) => {
-		this.cancelSearch();
-
+		this.refs.search.clear();
 		this.props.onSelect( item );
 	}
 
@@ -80,6 +79,7 @@ class SearchAutocomplete extends Component {
 						pinned
 						fitsContainer
 						delaySearch
+						ref="search"
 						onSearch={ this.handleSearch }
 						onSearchOpen={ this.handleSearchOpen }
 						onSearchClose={ this.handleSearchClose }
