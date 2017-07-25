@@ -133,8 +133,8 @@ const AddPackageDialog = ( props ) => {
 	};
 
 	const fieldInfo = ( field, nonEmptyText ) => {
-		const altText = nonEmptyText || translate( 'Invalid value' );
-		const text = '' === _.trim( packageData[ field ] ) ? translate( 'This field is required' ) : altText;
+		const altText = nonEmptyText || translate( 'Invalid value.' );
+		const text = '' === _.trim( packageData[ field ] ) ? translate( 'This field is required.' ) : altText;
 		return modalErrors[ field ] ? <FieldError text={ text } /> : null;
 	};
 
