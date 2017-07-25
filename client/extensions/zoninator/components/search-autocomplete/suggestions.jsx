@@ -82,7 +82,6 @@ class Suggestions extends Component {
 			case 'Enter':
 				if ( !! this.state.currentSuggestion ) {
 					this.props.suggest( this.state.currentSuggestion );
-					event.preventDefault();
 					return true;
 				}
 				break;

@@ -64,6 +64,10 @@ class Zone extends Component {
 		event.preventDefault();
 	}
 
+	onFormSubmit = ( event ) => {
+		event.preventDefault();
+	}
+
 	renderPosts = ( { fields } ) => {
 		const { translate } = this.props;
 		const posts = fields.getAll() || [];
@@ -127,7 +131,7 @@ class Zone extends Component {
 					{ translate( 'Edit zone' ) }
 				</HeaderCake>
 
-				<form>
+				<form onSubmit={ this.onFormSubmit }>
 					<FormSection name="details">
 						<SectionHeader label={ translate( 'Zone details' ) }>
 							<FormButton compact />
