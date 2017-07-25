@@ -3,6 +3,7 @@
  */
 import React, { Component, PropTypes } from 'react';
 import { localize } from 'i18n-calypso';
+import classNames from 'classnames';
 
 /**
  * Internal dependencies
@@ -23,6 +24,7 @@ class SearchAutocomplete extends Component {
 
 	state = {
 		search: '',
+		searchIsOpen: false,
 	}
 
 	handleSearch = ( term ) => {
@@ -49,15 +51,28 @@ class SearchAutocomplete extends Component {
 		this.props.onSelect( item );
 	}
 
-	cancelSearch = () => {
-		this.handleSearch( '' );
+	handleSearchClose = () => {
+		this.setState( () => ( {
+			search: '',
+			searchIsOpen: false,
+		} ) );
+	}
+
+	handleSearchOpen = () => {
+		this.setState( () => ( {
+			searchIsOpen: true,
+		} ) );
 	}
 
 	render() {
 		const { ignored, translate } = this.props;
 
+		const searchAutocompleteClass = classNames( 'search-autocomplete', {
+			'has-highlight': this.state.searchIsOpen,
+		} );
+
 		return (
-			<div className="search-autocomplete">
+			<div className={ searchAutocompleteClass }>
 				<Card className="search-autocomplete__card">
 					{ this.props.children }
 
@@ -66,7 +81,8 @@ class SearchAutocomplete extends Component {
 						fitsContainer
 						delaySearch
 						onSearch={ this.handleSearch }
-						onSearchClose={ this.cancelSearch }
+						onSearchOpen={ this.handleSearchOpen }
+						onSearchClose={ this.handleSearchClose }
 						onKeyDown={ this.handleKeyDown }
 						placeholder={ translate( 'Search for content' ) } />
 					<Suggestions
