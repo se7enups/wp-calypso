@@ -10,10 +10,10 @@ import classNames from 'classnames';
  * Internal dependencies
  */
 import PackagesListItem from './packages-list-item';
-import Spinner from 'components/spinner';
 
 const PackagesList = ( {
 		siteId,
+		isFetching,
 		packages,
 		dimensionUnit,
 		editable,
@@ -23,6 +23,10 @@ const PackagesList = ( {
 		togglePackage,
 		translate
 	} ) => {
+	if ( isFetching ) {
+		packages = [ {}, {}, {} ];
+	}
+
 	const renderPackageListItem = ( pckg, idx ) => {
 		const isSelected = selected && includes( selected, pckg.id );
 		const onToggle = () => togglePackage( siteId, serviceId, pckg.id );
@@ -31,6 +35,7 @@ const PackagesList = ( {
 			<PackagesListItem
 				key={ idx }
 				index={ idx }
+				isPlaceholder={ isFetching }
 				data={ pckg }
 				selected={ isSelected }
 				{ ...{
@@ -45,13 +50,6 @@ const PackagesList = ( {
 	};
 
 	const renderList = () => {
-		if ( ! packages ) {
-			return (
-				<div className="loading-spinner">
-					<Spinner size={ 24 } />
-				</div>
-			);
-		}
 		return packages.map( ( pckg, idx ) => renderPackageListItem( pckg, idx ) );
 	};
 
@@ -88,6 +86,7 @@ PackagesList.propTypes = {
 	packages: PropTypes.array,
 	dimensionUnit: PropTypes.string,
 	editable: PropTypes.bool.isRequired,
+	isFetching: PropTypes.bool,
 	selected: PropTypes.array,
 	serviceId: PropTypes.string,
 	groupId: PropTypes.string,

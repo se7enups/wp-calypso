@@ -15,7 +15,6 @@ import Button from 'components/button';
 import Card from 'components/card';
 import ExtendedHeader from 'woocommerce/components/extended-header';
 import FoldableCard from 'components/foldable-card';
-import Spinner from 'components/spinner';
 import PackagesList from './packages-list';
 import AddPackageDialog from './add-package';
 import * as PackagesActions from '../../state/packages/actions';
@@ -51,7 +50,19 @@ class Packages extends Component {
 		} );
 	};
 
-	renderPredefHeader = ( title, selected, packages, serviceId, groupId ) => {
+	renderPredefHeader = ( isPlaceholder, title, selected, packages, serviceId, groupId ) => {
+		if ( isPlaceholder ) {
+			return (
+				<div className="packages__group-header" >
+					<BulkSelect
+						totalElements={ 0 }
+						selectedElements={ 1 }
+						className="packages__group-header-checkbox" />
+					<p /><p /><p />
+				</div>
+			);
+		}
+
 		if ( ! selected ) {
 			return null;
 		}
@@ -78,11 +89,17 @@ class Packages extends Component {
 		const { siteId, isFetching, translate, form } = this.props;
 
 		if ( isFetching ) {
-			return (
-				<div>
-					<Spinner size={ 24 } />
-				</div>
-			);
+			return [ {}, {} ].map( ( o, i ) => (
+				<FoldableCard
+					className="packages__predefined-packages placeholder"
+					key={ i }
+					header={ this.renderPredefHeader( true ) }
+					summary={ <p /> }
+					clickableHeader={ true }
+					expanded={ false }
+					icon="chevron-down"
+				/>
+			) );
 		}
 
 		_.forEach( form.predefinedSchema, ( servicePackages, serviceId ) => {
@@ -101,7 +118,7 @@ class Packages extends Component {
 				elements.push( <FoldableCard
 					className="packages__predefined-packages"
 					key={ `${ serviceId }_${ groupId }` }
-					header={ this.renderPredefHeader( predefGroup.title, groupSelected, nonFlatRates, serviceId, groupId ) }
+					header={ this.renderPredefHeader( false, predefGroup.title, groupSelected, nonFlatRates, serviceId, groupId ) }
 					summary={ summary }
 					expandedSummary={ summary }
 					clickableHeader={ true }
@@ -141,6 +158,7 @@ class Packages extends Component {
 				<Card className="packages__packages">
 					<PackagesList
 						siteId={ this.props.siteId }
+						isFetching={ isFetching }
 						packages={ ( form.packages || {} ).custom }
 						dimensionUnit={ form.dimensionUnit }
 						editable={ true }

@@ -48,6 +48,7 @@ const renderActions = ( openModal, translate ) => {
 
 const PackagesListItem = ( {
 	siteId,
+	isPlaceholder,
 	index,
 	data,
 	dimensionUnit,
@@ -58,6 +59,27 @@ const PackagesListItem = ( {
 	hasError,
 	translate,
 } ) => {
+	if ( isPlaceholder ) {
+		return (
+			<div className="packages__packages-row placeholder">
+				<div className="packages__packages-row-icon">
+					<Gridicon icon="product" size={ 18 } />
+				</div>
+				<div className="packages__packages-row-details">
+					<div className="packages__packages-row-details-name">
+						<span />
+					</div>
+				</div>
+				<div className="packages__packages-row-dimensions">
+					<span />
+				</div>
+				<div className="packages__packages-row-actions">
+					<Button compact>{ translate( 'Edit' ) }</Button>
+				</div>
+			</div>
+		);
+	}
+
 	const openModal = editable ? ( event ) => {
 		event.preventDefault();
 		editPackage( siteId, Object.assign( {}, data, { index } ) );
@@ -80,6 +102,7 @@ const PackagesListItem = ( {
 
 PackagesListItem.propTypes = {
 	siteId: PropTypes.number,
+	isPlaceholder: PropTypes.bool,
 	index: PropTypes.number.isRequired,
 	data: PropTypes.shape( {
 		name: PropTypes.string,
@@ -88,7 +111,7 @@ PackagesListItem.propTypes = {
 	} ).isRequired,
 	editable: PropTypes.bool.isRequired,
 	selected: PropTypes.bool,
-	dimensionUnit: PropTypes.string.isRequired,
+	dimensionUnit: PropTypes.string,
 	onToggle: PropTypes.func,
 	editPackage: PropTypes.func,
 };
