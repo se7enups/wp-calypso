@@ -25,6 +25,9 @@ class PostCard extends Component {
 		const {
 			translate,
 			post: {
+				ID,
+				URL,
+				site_ID,
 				title,
 				slug,
 			}
@@ -32,8 +35,22 @@ class PostCard extends Component {
 
 		return (
 			<SectionHeader key={ slug } label={ title } className="zone__list-item">
-				<Button compact>{ translate( 'View' ) }</Button>
-				<Button compact>{ translate( 'Edit' ) }</Button>
+				<Button
+					compact
+					onMouseDown={ this.handleMouseDown }
+					href={ URL }
+					target="_blank"
+					rel="noopener noreferrer">
+					{ translate( 'View' ) }
+				</Button>
+				<Button
+					compact
+					onMouseDown={ this.handleMouseDown }
+					href={ `/post/${ site_ID }/${ ID }` }
+					target="_blank"
+					rel="noopener noreferrer">
+					{ translate( 'Edit' ) }
+				</Button>
 				<Button
 					compact
 					scary
