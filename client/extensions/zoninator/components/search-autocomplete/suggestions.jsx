@@ -3,7 +3,7 @@
  */
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { findIndex } from 'lodash';
+import { find, findIndex } from 'lodash';
 import classNames from 'classnames';
 
 /**
@@ -40,7 +40,7 @@ class Suggestions extends Component {
 			return [];
 		}
 
-		return this.props.suggestions.filter( ( { slug } ) => ! findIndex( this.props.ignored, { slug } ) );
+		return this.props.suggestions.filter( ( { slug } ) => ! find( this.props.ignored, { slug } ) );
 	}
 
 	getSuggestionForPosition( position ) {
