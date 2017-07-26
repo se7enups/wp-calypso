@@ -58,7 +58,6 @@
 
 	&.packages__packages-header {
 		border-bottom-color: lighten( $gray, 20% );
-		border-top: 1px solid lighten( $gray, 20% );
 	}
 
 	&.selectable {
@@ -168,6 +167,10 @@
 
 .packages__predefined-packages {
 	margin-bottom: 0;
+
+	.packages__packages-header {
+		border-top: 1px solid lighten( $gray, 20% );
+	}
 
 	.foldable-card__header {
 		.packages__group-header {
