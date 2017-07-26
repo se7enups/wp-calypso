@@ -57,6 +57,12 @@
 	font-style: italic;
 }
 
+.label-settings__labels-container {
+	.form-fieldset:last-child {
+		margin-bottom: 0;
+	}
+}
+
 .label-settings__placeholder {
 	@include placeholder();
 	pointer-events: none;
