@@ -16,7 +16,7 @@ import ShippingOrigin from './shipping-origin';
 import ShippingZoneList from './shipping-zone-list';
 
 const Shipping = ( { className } ) => {
-	const wcsEnabled = config.isEnabled( 'woocommerce/wcs-enabled' );
+	const wcsEnabled = config.isEnabled( 'woocommerce/extension-wcservices' );
 
 	return (
 		<Main className={ classNames( 'shipping', className ) }>

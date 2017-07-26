@@ -53,7 +53,7 @@ class ShippingSettingsSaveButton extends Component {
 
 	render() {
 		const { translate, loading, site, finishedInitialSetup } = this.props;
-		const wcsEnabled = config.isEnabled( 'woocommerce/wcs-enabled' );
+		const wcsEnabled = config.isEnabled( 'woocommerce/extension-wcservices' );
 
 		if ( loading || ! site ) {
 			return null;

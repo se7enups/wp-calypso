@@ -171,7 +171,7 @@
 		"woocommerce/extension-settings-shipping": true,
 		"woocommerce/extension-settings-tax": true,
 		"woocommerce/extension-stats": true,
-		"woocommerce/wcs-enabled": true,
+		"woocommerce/extension-wcservices": true,
 		"wpcom-user-bootstrap": false
 	}
 }
