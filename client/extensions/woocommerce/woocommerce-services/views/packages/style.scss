@@ -229,3 +229,7 @@
 .packages__delete {
 	float: left;
 }
+
+&.packages__add-edit-dialog {
+	max-width: 600px;
+}
