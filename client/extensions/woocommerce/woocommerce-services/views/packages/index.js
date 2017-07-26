@@ -169,9 +169,7 @@ class Packages extends Component {
 				<ExtendedHeader
 					label={ translate( 'Service Packages' ) }
 					description={ translate( 'Select packages provided by the shipping services that you use.' ) } />
-				<Card className="packages__packages">
 					{ this.renderPredefinedPackages() }
-				</Card>
 			</div>
 		);
 	}
