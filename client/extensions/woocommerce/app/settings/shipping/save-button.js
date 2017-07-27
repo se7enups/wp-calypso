@@ -6,11 +6,11 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { localize } from 'i18n-calypso';
 import page from 'page';
-import config from 'config';
 
 /**
  * Internal dependencies
  */
+import config from 'config';
 import Button from 'components/button';
 import { fetchSetupChoices } from 'woocommerce/state/sites/setup-choices/actions';
 import {

@@ -3,11 +3,11 @@
  */
 import React, { PropTypes } from 'react';
 import classNames from 'classnames';
-import config from 'config';
 
 /**
  * Internal dependencies
  */
+import config from 'config';
 import Main from 'components/main';
 import LabelSettings from 'woocommerce/woocommerce-services/views/label-settings';
 import Packages from 'woocommerce/woocommerce-services/views/packages';
