@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import _ from 'lodash';
+import { concat, difference, omitBy, omit, trim, uniq } from 'lodash';
 
 /**
  * Internal dependencies
@@ -27,7 +27,7 @@ export const initialState = {
 	modalErrors: {},
 };
 
-const isNullOrEmpty = ( value ) => null === value || '' === _.trim( value );
+const isNullOrEmpty = ( value ) => null === value || '' === trim( value );
 
 const reducers = {};
 
@@ -76,7 +76,7 @@ reducers[ SET_SELECTED_PRESET ] = ( state, action ) => {
 
 reducers[ UPDATE_PACKAGES_FIELD ] = ( state, action ) => {
 	const mergedPackageData = Object.assign( {}, state.packageData, action.values );
-	const newPackageData = _.omitBy( mergedPackageData, isNullOrEmpty );
+	const newPackageData = omitBy( mergedPackageData, isNullOrEmpty );
 	return Object.assign( {}, state, {
 		packageData: newPackageData,
 		pristine: false,
@@ -97,9 +97,7 @@ reducers[ SAVE_PACKAGE ] = ( state, action ) => {
 
 	if ( 'index' in packageData ) {
 		const { index } = packageData;
-		const item = _.omit( packageData, 'index' );
-
-		custom[ index ] = item;
+		custom[ index ] = omit( packageData, 'index' );
 	} else {
 		custom.push( packageData );
 	}
@@ -145,7 +143,7 @@ reducers[ REMOVE_PACKAGE ] = ( state, action ) => {
 reducers[ TOGGLE_ALL ] = ( state, { serviceId, groupId, checked } ) => {
 	const groupPackages = state.predefinedSchema[ serviceId ][ groupId ].definitions.map( ( def ) => def.id );
 	const selected = state.packages.predefined[ serviceId ];
-	const newSelected = checked ? _.uniq( _.concat( selected, groupPackages ) ) : _.difference( selected, groupPackages );
+	const newSelected = checked ? uniq( concat( selected, groupPackages ) ) : difference( selected, groupPackages );
 
 	const newPredefined = {	...state.packages.predefined };
 	newPredefined[ serviceId ] = newSelected;

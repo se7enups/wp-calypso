@@ -3,7 +3,7 @@
  */
 import React, { PropTypes } from 'react';
 import { localize } from 'i18n-calypso';
-import _ from 'lodash';
+import { concat, difference, flatten, map, omit, trim } from 'lodash';
 import Gridicon from 'gridicons';
 
 /**
@@ -101,9 +101,9 @@ const AddPackageDialog = ( props ) => {
 		const editName = 'number' === typeof packageData.index ? customPackages[ packageData.index ].name : null;
 
 		//get reserved box names:
-		const boxNames = _.concat(
-			_.difference( customPackages.map( ( boxPackage ) => boxPackage.name ), [ editName ] ), //existing custom boxes
-			_.flatten( _.map( predefinedSchema, predef => _.map( predef, group => group.definitions ) ) ), //predefined boxes
+		const boxNames = concat(
+			difference( customPackages.map( ( boxPackage ) => boxPackage.name ), [ editName ] ), //existing custom boxes
+			flatten( map( predefinedSchema, predef => map( predef, group => group.definitions ) ) ), //predefined boxes
 			[ 'individual' ] //reserved for items shipping in original packaging
 		);
 
@@ -128,13 +128,13 @@ const AddPackageDialog = ( props ) => {
 	const updateTextField = ( event ) => {
 		const key = event.target.name;
 		const value = event.target.value;
-		setModalErrors( siteId, _.omit( modalErrors, key ) );
+		setModalErrors( siteId, omit( modalErrors, key ) );
 		updatePackagesField( siteId, { [ key ]: value } );
 	};
 
 	const fieldInfo = ( field, nonEmptyText ) => {
 		const altText = nonEmptyText || translate( 'Invalid value.' );
-		const text = '' === _.trim( packageData[ field ] ) ? translate( 'This field is required.' ) : altText;
+		const text = '' === trim( packageData[ field ] ) ? translate( 'This field is required.' ) : altText;
 		return modalErrors[ field ] ? <FieldError text={ text } /> : null;
 	};
 

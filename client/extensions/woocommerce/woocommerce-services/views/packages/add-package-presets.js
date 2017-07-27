@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React, { PropTypes } from 'react';
-import { translate as __ } from 'i18n-calypso';
+import { localize } from 'i18n-calypso';
 
 /**
  * Internal dependencies
@@ -57,7 +57,7 @@ const handleSelectEvent = ( e, selectDefault, selectPreset, setSelectedPreset ) 
 	}
 };
 
-const AddPackagePresets = ( { siteId, selectedPreset, setSelectedPreset, presets, setModalErrors, updatePackagesField } ) => {
+const AddPackagePresets = ( { siteId, selectedPreset, setSelectedPreset, presets, setModalErrors, updatePackagesField, translate } ) => {
 	const onSelectPreset = ( idx ) => {
 		const preset = presets.boxes[ idx ];
 		setModalErrors( siteId, {} );
@@ -86,7 +86,7 @@ const AddPackagePresets = ( { siteId, selectedPreset, setSelectedPreset, presets
 
 	return (
 		<FormFieldset>
-			<FormLabel htmlFor="package_type">{ __( 'Type of package' ) }</FormLabel>
+			<FormLabel htmlFor="package_type">{ translate( 'Type of package' ) }</FormLabel>
 			<SelectOptGroups
 				id="package_type"
 				defaultValue={ selectedPreset }
@@ -106,4 +106,4 @@ AddPackagePresets.propTypes = {
 	updatePackagesField: PropTypes.func.isRequired,
 };
 
-export default AddPackagePresets;
+export default localize( AddPackagePresets );

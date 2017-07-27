@@ -3,7 +3,7 @@
  */
 import React, { PropTypes } from 'react';
 import { localize } from 'i18n-calypso';
-import _ from 'lodash';
+import { trim } from 'lodash';
 import Gridicon from 'gridicons';
 import classNames from 'classnames';
 
@@ -25,7 +25,7 @@ const renderIcon = ( isLetter, isError ) => {
 };
 
 const renderName = ( name, translate ) => {
-	return name && '' !== _.trim( name )
+	return name && '' !== trim( name )
 		? name
 		: translate( 'Untitled' );
 };

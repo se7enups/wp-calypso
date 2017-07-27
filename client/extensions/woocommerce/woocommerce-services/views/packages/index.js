@@ -5,7 +5,7 @@ import React, { PropTypes, Component } from 'react';
 import { localize } from 'i18n-calypso';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import _ from 'lodash';
+import { difference, filter, forEach, reject, some } from 'lodash';
 
 /**
  * Internal dependencies
@@ -36,7 +36,7 @@ class Packages extends Component {
 
 	predefSummary = ( serviceSelected, groupDefinitions ) => {
 		const groupPackageIds = groupDefinitions.map( ( def ) => def.id );
-		const diffLen = _.difference( groupPackageIds, serviceSelected ).length;
+		const diffLen = difference( groupPackageIds, serviceSelected ).length;
 		const { translate } = this.props;
 
 		if ( 0 >= diffLen ) {
@@ -102,17 +102,17 @@ class Packages extends Component {
 			) );
 		}
 
-		_.forEach( form.predefinedSchema, ( servicePackages, serviceId ) => {
+		forEach( form.predefinedSchema, ( servicePackages, serviceId ) => {
 			const serviceSelected = form.packages.predefined[ serviceId ] || [];
 
-			_.forEach( servicePackages, ( predefGroup, groupId ) => {
+			forEach( servicePackages, ( predefGroup, groupId ) => {
 				const groupPackages = predefGroup.definitions;
-				const nonFlatRates = _.reject( groupPackages, 'is_flat_rate' );
+				const nonFlatRates = reject( groupPackages, 'is_flat_rate' );
 				if ( ! nonFlatRates.length ) {
 					return;
 				}
 
-				const groupSelected = _.filter( serviceSelected, selectedId => _.some( groupPackages, pckg => pckg.id === selectedId ) );
+				const groupSelected = filter( serviceSelected, selectedId => some( groupPackages, pckg => pckg.id === selectedId ) );
 				const summary = this.predefSummary( groupSelected, nonFlatRates );
 
 				elements.push( <FoldableCard
