@@ -100,7 +100,7 @@ export const fetchSettings = ( siteId ) => ( dispatch, getState ) => {
 	}
 	dispatch( { type: SET_IS_FETCHING, isFetching: true, siteId } );
 
-	api.get( siteId, api.url.packages() )
+	api.get( siteId, api.url.packages )
 		.then( ( { formData, formSchema, storeOptions } ) => {
 			dispatch( {
 				type: INIT_PACKAGES_FORM,
@@ -121,7 +121,7 @@ export const fetchSettings = ( siteId ) => ( dispatch, getState ) => {
 export const submit = ( siteId, onSaveSuccess, onSaveFailure ) => ( dispatch, getState ) => {
 	const form = getPackagesForm( getState(), siteId );
 	dispatch( setIsSaving( siteId, true ) );
-	api.post( siteId, api.url.packages(), form.packages )
+	api.post( siteId, api.url.packages, form.packages )
 		.then( onSaveSuccess )
 		.catch( onSaveFailure )
 		.then( () => dispatch( setIsSaving( siteId, false ) ) );
