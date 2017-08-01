@@ -4,7 +4,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { find, findIndex } from 'lodash';
-import classNames from 'classnames';
 
 /**
  * Internal dependencies
@@ -12,6 +11,7 @@ import classNames from 'classnames';
 import QueryPosts from 'components/data/query-posts';
 import { getSitePostsForQuery } from 'state/posts/selectors';
 import { getSelectedSiteId } from 'state/ui/selectors';
+import SuggestionItem from './suggestion-item';
 
 class Suggestions extends Component {
 
@@ -40,7 +40,9 @@ class Suggestions extends Component {
 			return [];
 		}
 
-		return this.props.suggestions.filter( ( { slug } ) => ! find( this.props.ignored, { slug } ) );
+		const results = this.props.suggestions.filter( ( { slug } ) => ! find( this.props.ignored, { slug } ) );
+
+		return results;
 	}
 
 	getSuggestionForPosition( position ) {
@@ -90,10 +92,7 @@ class Suggestions extends Component {
 		return false;
 	}
 
-	handleMouseDown = ( slug, event ) => {
-		event.stopPropagation();
-		event.preventDefault();
-
+	handleMouseDown = ( slug ) => {
 		const position = findIndex( this.props.suggestions, { slug: slug } );
 		this.props.suggest( this.getSuggestionForPosition( position ) );
 	}
@@ -106,37 +105,14 @@ class Suggestions extends Component {
 		} );
 	}
 
-	createTextWithHighlight( text, highlightedText ) {
-		const re = new RegExp( '(' + highlightedText + ')', 'gi' );
-		const parts = text.split( re );
-		const token = parts.map( ( part, i ) => {
-			const key = text + i;
-			const lowercasePart = part.toLowerCase();
-			if ( lowercasePart === highlightedText ) {
-				return <span key={ key } className="search-autocomplete__text is-emphasized" >{ part }</span>;
-			}
-			return <span key={ key } className="search-autocomplete__text" >{ part }</span>;
-		} );
-
-		return token;
-	}
-
-	renderSuggestion = ( post, idx ) => {
-		const className = classNames(
-			'search-autocomplete__suggestion',
-			{ 'has-highlight': idx === this.state.suggestionPosition }
-		);
-
-		return (
-			<span
-				key={ idx }
-				className={ className }
-				onMouseDown={ this.handleMouseDown.bind( this, post.slug ) }
-				onMouseOver={ this.handleMouseOver.bind( this, post.slug ) }>
-				{ this.createTextWithHighlight( post.title, this.props.searchTerm ) }
-			</span>
-		);
-	}
+	renderSuggestion = ( post, idx ) => (
+		<SuggestionItem
+			key={ idx }
+			hasHighlight={ idx === this.state.suggestionPosition }
+			onMouseDown={ this.onMouseDown }
+			onMouseOver={ this.onMouseOver }
+			post={ post } />
+	)
 
 	render() {
 		const {
