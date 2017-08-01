@@ -22,10 +22,10 @@ import titlecase from 'to-title-case';
 import StatsFirstView from './stats-first-view';
 import StickyPanel from 'components/sticky-panel';
 import config from 'config';
-import { getSelectedSiteId, getSelectedSiteSlug } from 'state/ui/selectors';
-import { getSiteOption, isJetpackSite } from 'state/sites/selectors';
+import { getSelectedSiteId, getSelectedSiteSlug } from 'state/ui/selectors';
+import { getSiteOption, isJetpackSite } from 'state/sites/selectors';
 import { isPluginActive } from 'state/selectors';
-import { recordGoogleEvent } from 'state/analytics/actions';
+import { recordGoogleEvent } from 'state/analytics/actions';
 
 class StatsSite extends Component {
 	constructor( props ) {
@@ -131,7 +131,7 @@ class StatsSite extends Component {
 							<DatePicker
 								period={ period }
 								date={ date }
-								query={ query }
+								query={ query }
 								statsType="statsTopPosts"
 								showQueryDate
 							/>
@@ -206,5 +206,5 @@ export default connect(
 			slug: getSelectedSiteSlug( state )
 		};
 	},
-	{  recordGoogleEvent }
+	{ recordGoogleEvent }
 )( localize( StatsSite ) );
