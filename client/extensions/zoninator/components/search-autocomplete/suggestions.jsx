@@ -31,26 +31,42 @@ class Suggestions extends Component {
 		currentSuggestion: null,
 	}
 
-	countSuggestions() {
-		return this.props.suggestions ? this.props.suggestions.length : 0;
+	setInitialState( props ) {
+		const suggestions = this.filterSuggestions( props.suggestions, props.ignored );
+
+		this.setState( {
+			suggestionPosition: 0,
+			currentSuggestion: suggestions[ 0 ],
+			suggestions,
+		} );
 	}
 
-	filterSuggestions() {
-		if ( ! this.countSuggestions() ) {
+	componentWillMount() {
+		this.setInitialState( this.props );
+	}
+
+	componentWillReceiveProps( nextProps ) {
+		if ( nextProps.searchTerm !== this.props.searchTerm ) {
+			this.setInitialState( nextProps );
+		}
+	}
+
+	filterSuggestions( suggestions, ignored ) {
+		if ( ! suggestions || suggestions.length === 0 ) {
 			return [];
 		}
 
-		const results = this.props.suggestions.filter( ( { slug } ) => ! find( this.props.ignored, { slug } ) );
+		const results = suggestions.filter( ( { slug } ) => ! find( ignored, { slug } ) );
 
 		return results;
 	}
 
 	getSuggestionForPosition( position ) {
-		return this.props.suggestions[ position ];
+		return this.state.suggestions[ position ];
 	}
 
 	incPosition() {
-		const position = ( this.state.suggestionPosition + 1 ) % this.countSuggestions();
+		const position = ( this.state.suggestionPosition + 1 ) % this.state.suggestions.length;
 		this.setState( {
 			suggestionPosition: position,
 			currentSuggestion: this.getSuggestionForPosition( position ),
@@ -60,13 +76,13 @@ class Suggestions extends Component {
 	decPosition() {
 		const position = this.state.suggestionPosition - 1;
 		this.setState( {
-			suggestionPosition: position < 0 ? this.countSuggestions() - 1 : position,
+			suggestionPosition: position < 0 ? this.state.suggestions.length - 1 : position,
 			currentSuggestion: this.getSuggestionForPosition( position ),
 		} );
 	}
 
 	handleKeyEvent = ( event ) => {
-		if ( this.countSuggestions() === 0 ) {
+		if ( this.state.suggestions.length === 0 ) {
 			return false;
 		}
 
@@ -93,12 +109,12 @@ class Suggestions extends Component {
 	}
 
 	handleMouseDown = ( slug ) => {
-		const position = findIndex( this.props.suggestions, { slug: slug } );
+		const position = findIndex( this.state.suggestions, { slug: slug } );
 		this.props.suggest( this.getSuggestionForPosition( position ) );
 	}
 
 	handleMouseOver = ( slug ) => {
-		const position = findIndex( this.props.suggestions, { slug: slug } );
+		const position = findIndex( this.state.suggestions, { slug: slug } );
 		this.setState( {
 			suggestionPosition: position,
 			currentSuggestion: this.getSuggestionForPosition( position ),
@@ -108,9 +124,10 @@ class Suggestions extends Component {
 	renderSuggestion = ( post, idx ) => (
 		<SuggestionItem
 			key={ idx }
+			searchTerm={ this.props.searchTerm }
 			hasHighlight={ idx === this.state.suggestionPosition }
-			onMouseDown={ this.onMouseDown }
-			onMouseOver={ this.onMouseOver }
+			onMouseDown={ this.handleMouseDown }
+			onMouseOver={ this.handleMouseOver }
 			post={ post } />
 	)
 
@@ -124,16 +141,14 @@ class Suggestions extends Component {
 			return null;
 		}
 
-		const showSuggestions = this.countSuggestions() > 0;
-
 		return (
 			<div>
 				<QueryPosts siteId={ siteId } query={ { search: searchTerm } } />
 
 				{
-					showSuggestions &&
+					this.state.currentSuggestion &&
 					<div className="search-autocomplete__suggestions">
-						{ this.filterSuggestions().map( this.renderSuggestion ) }
+						{ this.state.suggestions.map( this.renderSuggestion ) }
 					</div>
 				}
 			</div>

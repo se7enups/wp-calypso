@@ -79,6 +79,7 @@ class SearchAutocomplete extends Component {
 						pinned
 						fitsContainer
 						delaySearch
+						disableAutocorrect
 						ref="search"
 						onSearch={ this.handleSearch }
 						onSearchOpen={ this.handleSearchOpen }

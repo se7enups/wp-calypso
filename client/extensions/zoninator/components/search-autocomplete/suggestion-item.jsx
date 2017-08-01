@@ -25,12 +25,15 @@ class SuggestionItem extends Component {
 	createTextWithHighlight( text, highlightedText ) {
 		const re = new RegExp( '(' + highlightedText + ')', 'gi' );
 		const parts = text.split( re );
+
 		const token = parts.map( ( part, i ) => {
 			const key = text + i;
 			const lowercasePart = part.toLowerCase();
+
 			if ( lowercasePart === highlightedText ) {
 				return <span key={ key } className="search-autocomplete__text is-emphasized" >{ part }</span>;
 			}
+
 			return <span key={ key } className="search-autocomplete__text" >{ part }</span>;
 		} );
 

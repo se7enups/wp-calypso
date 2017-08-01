@@ -37,8 +37,8 @@ const RecentPostsDropdown = ( {
 	return (
 		<div>
 			<QueryPosts siteId={ siteId } query={ recentPostsQuery } />
-			<select className={ selectClass } onChange={ handleChange }>
-				<option selected>{ translate( 'Recent posts' ) }</option>
+			<select className={ selectClass } onChange={ handleChange } defaultValue="recent">
+				<option value="recent">{ translate( 'Recent posts' ) }</option>
 				{ posts.length > 0 && posts.map( post => (
 					<option key={ post.slug } value={ post.slug }>{ post.title }</option>
 				)	) }
