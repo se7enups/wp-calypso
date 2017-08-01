@@ -3,7 +3,7 @@
  */
 import React, { Component } from 'react';
 import { localize } from 'i18n-calypso';
-import { flowRight, noop } from 'lodash';
+import { flowRight } from 'lodash';
 import { FieldArray, FormSection, reduxForm } from 'redux-form';
 
 /**
@@ -15,13 +15,12 @@ import Card from 'components/card';
 import FormButton from 'components/forms/form-button';
 import FormFieldset from 'components/forms/form-fieldset';
 import FormLabel from 'components/forms/form-label';
-import FormTextarea from 'components/forms/form-textarea';
 import HeaderCake from 'components/header-cake';
-// import ReduxFormTextarea from 'components/redux-forms/redux-form-textarea';
+import ReduxFormTextarea from 'components/redux-forms/redux-form-textarea';
 import ReduxFormTextInput from 'components/redux-forms/redux-form-text-input';
 import SectionHeader from 'components/section-header';
 
-const form = 'editZone';
+const form = 'extensions.zoninator.editZone';
 
 class Zone extends Component {
 
@@ -29,16 +28,12 @@ class Zone extends Component {
 		event.preventDefault();
 	}
 
-	renderPosts = ( { fields } ) => {
-		return <PostsList fields={ fields } />;
-	}
-
 	render() {
 		const { siteSlug, translate } = this.props;
 
 		return (
 			<div>
-				<HeaderCake backHref={ `/extensions/zoninator/${ siteSlug }` } onClick={ noop }>
+				<HeaderCake backHref={ `/extensions/zoninator/${ siteSlug }` }>
 					{ translate( 'Edit zone' ) }
 				</HeaderCake>
 
@@ -55,7 +50,7 @@ class Zone extends Component {
 
 							<FormFieldset>
 								<FormLabel htmlFor="zoneDescription">{ translate( 'Zone description' ) }</FormLabel>
-								<FormTextarea name="zoneDescription" />
+								<ReduxFormTextarea name="zoneDescription" />
 							</FormFieldset>
 						</Card>
 					</FormSection>
@@ -65,7 +60,10 @@ class Zone extends Component {
 							<FormButton compact />
 						</SectionHeader>
 						<Card>
-							<FieldArray name="posts" component={ PostsList } />
+							<FieldArray
+								rerenderOnEveryChange
+								name="posts"
+								component={ PostsList } />
 						</Card>
 					</FormSection>
 				</form>
@@ -80,8 +78,7 @@ class Zone extends Component {
 
 const createReduxForm = reduxForm( {
 	enableReinitialize: true,
-	form: form,
-	getFormState: state => state.extensions.zoninator.form,
+	form,
 } );
 
 export default flowRight(
