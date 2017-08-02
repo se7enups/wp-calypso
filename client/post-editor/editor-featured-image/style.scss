@@ -5,6 +5,12 @@
 	line-height: 0;
 }
 
+.editor-featured-image.has-active-drop-zone {
+	display: block;
+	position: relative;
+	height: 150px;
+}
+
 .editor-featured-image__current-image {
 	position: relative;
 	display: inline-block;

@@ -17,6 +17,7 @@ import PostActions from 'lib/posts/actions';
 import PostUtils from 'lib/posts/utils';
 import * as stats from 'lib/posts/stats';
 import EditorFeaturedImagePreviewContainer from './preview-container';
+import FeaturedImageDropZone from 'post-editor/editor-featured-image/dropzone';
 import Button from 'components/button';
 import { getMediaItem } from 'state/selectors';
 import { getFeaturedImageId } from 'lib/posts/utils';
@@ -32,11 +33,13 @@ class EditorFeaturedImage extends Component {
 		selecting: React.PropTypes.bool,
 		onImageSelected: React.PropTypes.func,
 		featuredImage: React.PropTypes.object,
+		dropZone: React.PropTypes.bool,
 	};
 
 	static defaultProps = {
 		maxWidth: 450,
-		onImageSelected: () => {}
+		onImageSelected: () => {},
+		dropZone: false,
 	};
 
 	state = {
@@ -121,8 +124,10 @@ class EditorFeaturedImage extends Component {
 	render() {
 		const { site, post } = this.props;
 		const featuredImageId = getFeaturedImageId( post );
+		const dropZoneIsActive = true;  // todo not sure best way to determine if it's active w/ out coupling. maybe create a selector to pick isDraggingOverDocument from the redux store?
 		const classes = classnames( 'editor-featured-image', {
-			'is-assigned': !! PostUtils.getFeaturedImageId( this.props.post )
+			'is-assigned': !! PostUtils.getFeaturedImageId( this.props.post ),
+			'has-active-drop-zone': this.props.dropZone && dropZoneIsActive,
 		} );
 
 		return (
@@ -143,6 +148,8 @@ class EditorFeaturedImage extends Component {
 						icon="pencil"
 						className="editor-featured-image__edit-icon" />
 				</Button>
+
+				{ this.props.dropZone ? <FeaturedImageDropZone /> : '' }
 			</div>
 		);
 	}
