@@ -34,6 +34,7 @@ import { getSiteSlug } from 'state/sites/selectors';
 import MediaLibraryHeader from './header';
 import MediaLibraryScaleHeader from './empty-header';
 import MediaLibraryList from './list';
+import InlineConnection from 'my-sites/sharing/connections/inline-connection';
 import { requestKeyringConnections } from 'state/sharing/keyring/actions';
 import {
 	isKeyringConnectionsFetching,
@@ -41,6 +42,9 @@ import {
 } from 'state/sharing/keyring/selectors';
 
 const isConnected = props => some( props.connectedServices, item => item.service === props.source );
+const waitForKeyring = ( props, state ) => props.source && ! state.hasKeyring;
+const isLoading = ( props, state ) => ! props.site || props.isRequesting || waitForKeyring( props, state );
+const needKeyringData = props => props.source !== '' && props.connectedServices.length === 0;
 
 class MediaLibraryContent extends React.Component {
 	static propTypes = {
@@ -65,11 +69,22 @@ class MediaLibraryContent extends React.Component {
 		source: '',
 	}
 
+	constructor( props ) {
+		super( props );
 
-		if ( ! this.props.isRequesting && this.props.source !== '' && this.props.connectedServices.length === 0 ) {
+		this.state = { hasKeyring: false };
+	}
+
 	componentWillMount() {
+		if ( needKeyringData( this.props ) ) {
 			// Are we connected to anything yet?
 			this.props.requestKeyringConnections();
+		}
+	}
+
+	componentWillReceiveProps( nextProps ) {
+		if ( this.props.isRequesting && ! nextProps.isRequesting ) {
+			this.setState( { hasKeyring: true } );
 		}
 	}
 
@@ -211,17 +226,15 @@ class MediaLibraryContent extends React.Component {
 
 	renderExternalMedia() {
 		const connectMessage = translate(
-			'To show Photos from Google, you need to connect your Google account. Do that from {{link}}your Sharing settings{{/link}}.', {
-				components: {
-					link: <a href={ `/sharing/${ this.props.site.slug }` } onClick={ this.goToSharing } />
-				}
-			}
+			'To show Photos from Google, you need to connect your Google account.'
 		);
 
 		return (
 			<div className="media-library__connect-message">
 				<p><img src="/calypso/images/sharing/google-photos-logo.svg" width="96" height="96" /></p>
 				<p>{ connectMessage }</p>
+
+				<InlineConnection serviceName="google_photos" />
 			</div>
 		);
 	}
@@ -238,8 +251,8 @@ class MediaLibraryContent extends React.Component {
 		return MEDIA_IMAGE_PHOTON;
 	}
 
-		if ( ! this.props.site || this.props.isRequesting ) {
 	renderMediaList() {
+		if ( isLoading( this.props, this.state ) && ! this.state.hasKeyring ) {
 			return <MediaLibraryList key="list-loading" filterRequiresUpgrade={ this.props.filterRequiresUpgrade } />;
 		}
 
@@ -273,6 +286,10 @@ class MediaLibraryContent extends React.Component {
 
 	renderHeader() {
 		if ( this.props.source !== '' ) {
+			if ( ! isConnected( this.props ) ) {
+				return null;
+			}
+
 			return (
 				<MediaLibraryScaleHeader onMediaScaleChange={ this.props.onMediaScaleChange } />
 			);
