@@ -18,6 +18,7 @@ import PostUtils from 'lib/posts/utils';
 import * as stats from 'lib/posts/stats';
 import EditorFeaturedImagePreviewContainer from './preview-container';
 import FeaturedImageDropZone from 'post-editor/editor-featured-image/dropzone';
+import isDropZoneVisible from 'state/selectors/is-drop-zone-visible';
 import Button from 'components/button';
 import { getMediaItem } from 'state/selectors';
 import { getFeaturedImageId } from 'lib/posts/utils';
@@ -33,13 +34,15 @@ class EditorFeaturedImage extends Component {
 		selecting: React.PropTypes.bool,
 		onImageSelected: React.PropTypes.func,
 		featuredImage: React.PropTypes.object,
-		dropZone: React.PropTypes.bool,
+		hasDropZone: React.PropTypes.bool,
+		isDropZoneVisible: React.PropTypes.bool,
 	};
 
 	static defaultProps = {
 		maxWidth: 450,
 		onImageSelected: () => {},
-		dropZone: false,
+		hasDropZone: false,
+		isDropZoneVisible: false,
 	};
 
 	state = {
@@ -124,10 +127,9 @@ class EditorFeaturedImage extends Component {
 	render() {
 		const { site, post } = this.props;
 		const featuredImageId = getFeaturedImageId( post );
-		const dropZoneIsActive = true;  // todo not sure best way to determine if it's active w/ out coupling. maybe create a selector to pick isDraggingOverDocument from the redux store?
 		const classes = classnames( 'editor-featured-image', {
 			'is-assigned': !! PostUtils.getFeaturedImageId( this.props.post ),
-			'has-active-drop-zone': this.props.dropZone && dropZoneIsActive,
+			'has-active-drop-zone': this.props.hasDropZone && this.props.isDropZoneVisible,
 		} );
 
 		return (
@@ -149,7 +151,7 @@ class EditorFeaturedImage extends Component {
 						className="editor-featured-image__edit-icon" />
 				</Button>
 
-				{ this.props.dropZone ? <FeaturedImageDropZone /> : '' }
+				{ this.props.hasDropZone ? <FeaturedImageDropZone /> : '' }
 			</div>
 		);
 	}
@@ -163,6 +165,7 @@ export default connect(
 
 		return {
 			featuredImage: getMediaItem( state, siteId, featuredImageId ),
+			isDropZoneVisible: isDropZoneVisible( state, 'featuredImage' )
 		};
 	},
 	{

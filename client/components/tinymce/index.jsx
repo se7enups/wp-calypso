@@ -495,6 +495,7 @@ module.exports = React.createClass( {
 			'is-visible': mode === 'html'
 		} );
 
+		// todo rename tinymce-container to tinymce, but have to rename textarea first and all associated styles - separate PR
 		return (
 			<div className="tinymce-container">
 				{ 'html' === mode && config.isEnabled( 'post-editor/html-toolbar' ) &&

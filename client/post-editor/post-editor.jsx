@@ -337,7 +337,7 @@ export const PostEditor = React.createClass( {
 								site={ site }
 								post={ this.state.post }
 								maxWidth={ 1462 }
-								dropZone={ true } />
+								hasDropZone={ true } />
 							<div className="post-editor__header">
 								<EditorTitle
 									onChange={ this.onEditorTitleChange }
@@ -381,15 +381,6 @@ export const PostEditor = React.createClass( {
 								onBlur={ this.copySelectedText }
 								onTextEditorChange={ this.onEditorContentChange } />
 						</div>
-
-						{/* todo need some code somewhere -- maybe in here -- so that if user drops a file on an empty area (an area that isn't a dropzone),
-						 then it just gets ignored and the zones get canceled, instead of opening that file in the browser
-
-						 also, why doesn't hitting esc cancel the dropzone? it does in the devdocs example
-						    oh, sometimes it does here too, but not always. need to keep an eye on it to see a pattern
-
-						unit tests for this?
-						 */}
 
 						<EditorWordCount
 							selectedText={ this.state.selectedText }

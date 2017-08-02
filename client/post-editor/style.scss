@@ -133,23 +133,8 @@
 	}
 }
 
-/* todo this might not be the right place in this file for this, but i think it's the right file at least */
 .post-editor__content-editor .tinymce-container {
-	 position: relative; /* todo explain that it's here so that the dropdown will only be inside the editor, not covering the title input, etc */
-
-	/*
-
-	this causes bug where toolbar (mce-toolbar-grp mce-container mce-panel mce-stack-layout-item mce-first) gets fixed position when you scroll down,
-	but doesn't revert back to being inline when you scroll up, so it's always covering the title bar
-	problem is `position:relative` creates new stacking context, so `container.offsetTop` is always `0` in `pinToolbarOnScroll`
-	add to test plan to test both at top of page and scrolled down
-	or maybe it's ok that that's broken, b/c it's only while the user is dragging/dropping. they won't be scrolling anyway during that time?
-
-	related: how should this behave when the user is scrolled down, so that the featured image drop area isn't even visible?
-	jump to the top of the page? make it fixed position at the top?
-	probably fine to just leave it off screen, 'cause sidebar is always visible
-
-	*/
+	position: relative; /* Constrain MediaLibraryDropZone to the editor content area, instead of taking up the entire screen */
 }
 
 .post-editor .tinymce {

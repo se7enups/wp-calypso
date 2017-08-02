@@ -64,7 +64,6 @@ class EditorDrawerFeaturedImage extends Component {
 						site={ site }
 						post={ post }
 					/>
-					{/* todo maybe change this to use dropzone as well? why would the dropzone be attached to the EditorDrawerWell instead of the FeaturedImage? */}
 				</EditorDrawerWell>
 			</Accordion>
 		);
