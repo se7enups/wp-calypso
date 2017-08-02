@@ -42,8 +42,8 @@ import {
 
 const isConnected = props => some( props.connectedServices, item => item.service === props.source );
 
-const MediaLibraryContent = React.createClass( {
-	propTypes: {
+class MediaLibraryContent extends React.Component {
+	static propTypes = {
 		site: React.PropTypes.object,
 		mediaValidationErrors: React.PropTypes.object,
 		filter: React.PropTypes.string,
@@ -57,24 +57,23 @@ const MediaLibraryContent = React.createClass( {
 		onMediaScaleChange: React.PropTypes.func,
 		onEditItem: React.PropTypes.func,
 		postId: React.PropTypes.number
-	},
+	};
 
-	getDefaultProps: function() {
-		return {
-			mediaValidationErrors: Object.freeze( {} ),
-			onAddMedia: noop,
-			source: '',
-		};
-	},
+	static defaultProps = {
+		mediaValidationErrors: Object.freeze( {} ),
+		onAddMedia: noop,
+		source: '',
+	}
 
-	componentWillMount: function() {
+
 		if ( ! this.props.isRequesting && this.props.source !== '' && this.props.connectedServices.length === 0 ) {
+	componentWillMount() {
 			// Are we connected to anything yet?
 			this.props.requestKeyringConnections();
 		}
-	},
+	}
 
-	renderErrors: function() {
+	renderErrors() {
 		var errorTypes, notices;
 
 		errorTypes = values( this.props.mediaValidationErrors ).map( head );
@@ -166,7 +165,7 @@ const MediaLibraryContent = React.createClass( {
 		} );
 
 		return createFragment( notices );
-	},
+	}
 
 	renderTryAgain() {
 		return (
@@ -174,11 +173,11 @@ const MediaLibraryContent = React.createClass( {
 				{ translate( 'Retry' ) }
 			</NoticeAction>
 		);
-	},
+	}
 
 	retryList() {
 		MediaActions.sourceChanged( this.props.site.ID );
-	},
+	}
 
 	renderNoticeAction( upgradeNudgeName, upgradeNudgeFeature ) {
 		if ( !upgradeNudgeName ) {
@@ -198,17 +197,17 @@ const MediaLibraryContent = React.createClass( {
 				<TrackComponentView eventName={ eventName } eventProperties={ eventProperties } />
 			</NoticeAction>
 		);
-	},
+	}
 
 	recordPlansNavigation( tracksEvent, tracksData ) {
 		analytics.ga.recordEvent( 'Media', 'Clicked Upload Error Action' );
 		analytics.tracks.recordEvent( tracksEvent, tracksData );
-	},
+	}
 
 	goToSharing( ev ) {
 		ev.preventDefault();
 		page( `/sharing/${ this.props.site.slug }` );
-	},
+	}
 
 	renderExternalMedia() {
 		const connectMessage = translate(
@@ -225,7 +224,7 @@ const MediaLibraryContent = React.createClass( {
 				<p>{ connectMessage }</p>
 			</div>
 		);
-	},
+	}
 
 	getThumbnailType() {
 		if ( this.props.source !== '' ) {
@@ -237,10 +236,10 @@ const MediaLibraryContent = React.createClass( {
 		}
 
 		return MEDIA_IMAGE_PHOTON;
-	},
+	}
 
-	renderMediaList: function() {
 		if ( ! this.props.site || this.props.isRequesting ) {
+	renderMediaList() {
 			return <MediaLibraryList key="list-loading" filterRequiresUpgrade={ this.props.filterRequiresUpgrade } />;
 		}
 
@@ -270,7 +269,7 @@ const MediaLibraryContent = React.createClass( {
 				</MediaLibrarySelectedData>
 			</MediaListData>
 		);
-	},
+	}
 
 	renderHeader() {
 		if ( this.props.source !== '' ) {
@@ -296,9 +295,9 @@ const MediaLibraryContent = React.createClass( {
 		}
 
 		return null;
-	},
+	}
 
-	render: function() {
+	render() {
 		return (
 			<div className="media-library__content">
 				{ this.renderHeader() }
@@ -307,7 +306,7 @@ const MediaLibraryContent = React.createClass( {
 			</div>
 		);
 	}
-} );
+}
 
 export default connect( ( state, ownProps ) => {
 	return {
