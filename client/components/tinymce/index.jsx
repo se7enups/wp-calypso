@@ -496,7 +496,7 @@ module.exports = React.createClass( {
 		} );
 
 		return (
-			<div>
+			<div className="tinymce-container">
 				{ 'html' === mode && config.isEnabled( 'post-editor/html-toolbar' ) &&
 					<EditorHtmlToolbar
 						content={ this.refs.text }

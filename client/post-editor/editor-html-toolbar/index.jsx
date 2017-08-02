@@ -682,6 +682,7 @@ export class EditorHtmlToolbar extends Component {
 				<MediaLibraryDropZone
 					onAddMedia={ this.onFilesDrop }
 					site={ site }
+					fullScreen={ false }
 				/>
 
 				<SimplePaymentsDialog
