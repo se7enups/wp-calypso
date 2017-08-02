@@ -38,6 +38,12 @@ function customPostMetadataToProductAttributes( metadata ) {
 	metadata.forEach( ( { key, value } ) => {
 		const schemaKey = metaKeyToSchemaKeyMap[ key ];
 		if ( schemaKey ) {
+			// If the property's type is marked as boolean in the schema,
+			// convert the value from PHP-ish truthy/falsy numbers to a plain boolean.
+			if ( metadataSchema[ schemaKey ].type === 'boolean' ) {
+				value = !! Number( value );
+			}
+
 			productAttributes[ schemaKey ] = value;
 		}
 	} );
@@ -81,12 +87,16 @@ export function productToCustomPost( product ) {
 
 	// Convert the `product` entries into a metadata array
 	const metadata = metadataEntries.map( ( [ key, value ] ) => {
-		if ( typeof value === 'boolean' ) {
+		const entrySchema = metadataSchema[ key ];
+
+		// If the property's type is marked as boolean in the schema,
+		// convert the value to PHP-ish truthy/falsy numbers.
+		if ( entrySchema.type === 'boolean' ) {
 			value = value ? 1 : 0;
 		}
 
 		return {
-			key: metadataSchema[ key ].metaKey,
+			key: entrySchema.metaKey,
 			value,
 		};
 	} );
